@@ -6,12 +6,13 @@
 将模型评分与静态规则相融合，以减少生产环境中的误报
 
 为什么建立此项目,纯模型分类对于分析来说并不实际，同时要对phpwebshell进行全面的验证，也要避免模型过于敏感自动联想任何高危或可执行的函数。
-主要是为了验证channel_stitch_AES.py生成的webshell.
+
+主要是为了验证channel_stitch_AES.py生成的webshell是否可通过AI检测.
   
 本项目采用“模型 + 规则融合”策略，在保持召回能力的同时，用分级处置控制误报。
 
 ### 方法
-当前的方法保持了强大的召回率（Recall），同时增加了基于规则的控制，以便做出更安全的决策：
+当前的方法保持了强大的Recall，同时增加了基于规则的控制，以便做出更安全的决策：
 
 high（高风险）：拦截（block）
 review（审查风险）：人工审查（manual review）
@@ -55,10 +56,12 @@ fused_score = w_model * model_prob + w_rule * rule_prob
 #### 典型
 在 Colab 中训练适配器（adapter）：
 
-colab-T4GPU:
+colab-T4:
+
 GPU-16G/CUDA核心数-2560/显存带宽-320GB/s/FP32-8.1 TFLOPS/FP16-65 TFLOPS/Tensor Cores	320/
 
 基础模型：Qwen/Qwen2-0.5B-Instruct
+
 数据集：nbuser32/PHP-Webshell-Dataset
 
 对于.php文件进行验证。
@@ -80,27 +83,25 @@ action
 - 全量标签分布：
   - `webshell(1)=16,324`（53.928%）
   - `benign(0)=13,946`（46.072%）
-- 本地切分规模（来自训练日志）：
+- 本地切分规模：
   - `train=24,216`
   - `val=3,027`
   - `test=3,027`
 - 说明：采用分层切分，子集标签比例与全量接近
 
 ## 决策策略
-fused_score >= 0.95 -> webshell（Webshell），high（高风险），block（拦截）
-0.78 <= fused_score < 0.95 -> suspicious（可疑），review（审查风险），manual_review（人工审查）
-< 0.78 -> benign（正常），low（低风险），allow（放行）
+fused_score >= 0.95 -> webshell，high，block
+
+0.78 <= fused_score < 0.95 -> suspicious，review，manual_review
+
+< 0.78 -> benign，low，allow
 
 
-## 后续步骤
-添加具有迷惑性的正常样本（hard-benign samples），以降低模型的过度敏感性。
+## 后续想法(最近没时间，等有空)
+添加具有迷惑性的正常样本，同时提高模型的过度敏感性来试试。
 使用类似生产环境的流量来校准阈值。
-添加持续集成（CI）检查，用于监控精确率（precision）、召回率（recall）和误报率（FPR）的回归情况。
+添加持续集成检查，用于监控精确率、recall和FPR的回归情况。
 
-- Use only in authorized environments.
-- Do not deploy generated malicious patterns in production systems.
-- Keep an audit trail for blocked and reviewed files.
-这三类文档可对应学术/工业常见规范（数据说明、模型说明、评估协议）。
 
 ## 边界
 
