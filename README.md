@@ -1,4 +1,4 @@
-# Godzilla_AES加密器_以及基于Channel-Stitch的webshell payload生成及关于Qwen2-0.5B-Instruc-webshell微调小模型检测方法与实时。
+# Godzilla_AES加密器_以及基于Channel-Stitch的webshell payload生成及关于Qwen2-0.5B-Instruc-webshell微调小模型检测方法与实施。
 基于哥斯拉底层反射的自定义AES通信插件，phpwebshell则基于Channel-Stitch生成
 
 本项目主要是因为哥斯拉原生默认流量加密在过去几年被标记的太狠了。重新写了个AES的加密器，以及webshell的荷载生成。
